@@ -1,11 +1,102 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import { PHONE_NUMBER, EMAIL_ADDRESS } from "astro:env/server";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Layout from "../layouts/Layout.astro";
+
+import Position from "../components/Position.astro";
+import Section from "../components/Section.astro";
+import IconLink from "../components/IconLink.astro";
+import ContactLink from "../components/ContactLink.astro";
+
+import "@fontsource/atkinson-hyperlegible";
 ---
 
 <Layout>
-	<Welcome />
+    <header>
+        <h1>Cass Fridkin</h1>
+        <address>
+            <IconLink href="https://linkedin.com/in/caass" icon="linkedin">
+                linkedin://caass
+            </IconLink>
+            <IconLink href="https://github.com/caass" icon="github">
+                github://caass
+            </IconLink>
+            <ContactLink
+                phoneNumber={PHONE_NUMBER}
+                emailAddress={EMAIL_ADDRESS}
+            />
+        </address>
+    </header>
+    <main>
+        <Section title="Experience">
+            <Position
+                org="Trace Machina"
+                from={new Date(2024, 4)}
+                to={new Date(2024, 9)}
+                role="Software Developer"
+                achievements={[
+                    "Mentored junior developers to develop in-house Rust expertise",
+                    "Spiked and iterated on product ideas to streamline customer adoption",
+                    "Built custom integrations for seamless communication with external services",
+                ]}
+            />
+            <Position
+                org="Redjack"
+                from={new Date(2023, 3)}
+                to={new Date(2023, 11)}
+                role="Senior Rust Engineer"
+                achievements={[
+                    "Re-architected final stage of multi-step data pipeline to highlight action items",
+                    "Refined serialized data format to save bandwidth during transmission",
+                    "Implemented asynchronous APIs for efficient and parallel operations",
+                ]}
+            />
+            <Position
+                org="Cloudflare"
+                from={new Date(2021, 1)}
+                to={new Date(2023, 1)}
+                positions={[
+                    {
+                        role: "Systems Engineer, Workers Experiences",
+                        achievements: [
+                            "Designed and built out bespoke build infrastructure for multiple projects",
+                            "Took on a mentorship role to both internal and external contributors",
+                            "Led design, implementation, and communication for deprecation effort",
+                        ],
+                    },
+                    {
+                        role: "Systems Engineer, Developer Productivity",
+                        achievements: [
+                            "Spearheaded backwards-compatibility effort in major software rewrite",
+                            "Drove major product features to completion involving multiple services",
+                            "Provided support for multiple product areas across the stack",
+                        ],
+                    },
+                ]}
+            />
+            <Position
+                org="Cheff"
+                from={new Date(2020, 2)}
+                to={new Date(2020, 5)}
+                role="Frontend Engineer"
+                achievements={[
+                    "Refactored existing React/Typescript codebase to adapt to client needs",
+                    "Iterated quickly and effectively on product requirement updates",
+                    "Implemented features across Amazon Web Services backend and UI",
+                ]}
+            />
+        </Section>
+    </main>
 </Layout>
+
+<style>
+    address {
+        display: flex;
+        flex-flow: row nowrap;
+        gap: 1rem;
+    }
+
+    h1 {
+        margin: 0;
+    }
+</style>

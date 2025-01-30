@@ -9,6 +9,10 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^5.1.8"
+    "@fontsource/atkinson-hyperlegible": "^5.1.1",
+    "@iconify-json/lucide": "^1.2.25",
+    "astro": "^5.1.8",
+    "astro-icon": "^1.1.5",
+    "typescript": "^5.7.3"
   }
 }

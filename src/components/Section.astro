@@ -1,0 +1,36 @@
+---
+interface Props {
+    title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<section class="outer">
+    <header>
+        <h2>{title}</h2>
+        <hr />
+    </header>
+    <section>
+        <slot />
+    </section>
+</section>
+
+<style>
+    section.outer {
+        display: flex;
+
+        flex-direction: column;
+    }
+
+    h2 {
+        margin-top: 0.2rem;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+
+    hr {
+        margin-top: 0.1rem;
+        margin-bottom: 0.1rem;
+    }
+</style>

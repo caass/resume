@@ -1,0 +1,28 @@
+---
+import type { ComponentProps, HTMLAttributes } from "astro/types";
+import { Icon } from "astro-icon/components";
+
+interface Props extends HTMLAttributes<"a"> {
+    icon: string;
+}
+
+const { icon, ...props } = Astro.props;
+---
+
+<a {...props}>
+    <Icon name={`lucide:${icon}`} />
+    <span>
+        <slot />
+    </span>
+</a>
+
+<style>
+    a {
+        color: inherit;
+
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        gap: 0.2rem;
+    }
+</style>
