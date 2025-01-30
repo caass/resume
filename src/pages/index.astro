@@ -3,6 +3,7 @@ import { PHONE_NUMBER, EMAIL_ADDRESS } from "astro:env/server";
 
 import Layout from "../layouts/Layout.astro";
 
+import Skill from "../components/Skill.astro";
 import Position from "../components/Position.astro";
 import Section from "../components/Section.astro";
 import IconLink from "../components/IconLink.astro";
@@ -170,6 +171,14 @@ import "@fontsource/atkinson-hyperlegible";
                     </li>
                 </Position>
             </Org>
+        </Section>
+        <Section title="Skills">
+            <Skill category="Languages">
+                Rust, JavaScript (Typescript/JSX), Go
+            </Skill>
+            <Skill category="Concepts">
+                Systems programming, distributed computing, UI/UX
+            </Skill>
         </Section>
     </main>
 </Layout>

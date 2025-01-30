@@ -1,0 +1,12 @@
+---
+interface Props {
+    category: string;
+}
+
+const { category } = Astro.props;
+---
+
+<section>
+    <h3>{category}</h3>
+    <span><slot /></span>
+</section>
