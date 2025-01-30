@@ -4,23 +4,37 @@ import { Icon } from "astro-icon/components";
 
 interface Props extends HTMLAttributes<"a"> {
     icon: string;
+    right?: true;
 }
 
-const { icon, ...props } = Astro.props;
+const { icon, right = false, ...props } = Astro.props;
 ---
 
 <a {...props}>
-    <Icon name={`lucide:${icon}`} />
-    <span>
-        <slot />
-    </span>
+    {
+        right ? (
+            <>
+                <span>
+                    <slot />
+                </span>
+                <Icon name={`lucide:${icon}`} />
+            </>
+        ) : (
+            <>
+                <Icon name={`lucide:${icon}`} />
+                <span>
+                    <slot />
+                </span>
+            </>
+        )
+    }
 </a>
 
 <style>
     a {
         color: inherit;
 
-        display: flex;
+        display: inline-flex;
         flex-flow: row nowrap;
         align-items: center;
         gap: 0.2rem;
