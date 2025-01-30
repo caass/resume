@@ -7,6 +7,7 @@ import Position from "../components/Position.astro";
 import Section from "../components/Section.astro";
 import IconLink from "../components/IconLink.astro";
 import ContactLink from "../components/ContactLink.astro";
+import Org from "../components/Org.astro";
 
 import "@fontsource/atkinson-hyperlegible";
 ---
@@ -29,90 +30,143 @@ import "@fontsource/atkinson-hyperlegible";
     </header>
     <main>
         <Section title="Experience">
-            <Position
-                org="Trace Machina"
+            <Org
+                name="Trace Machina"
                 from={new Date(2024, 4)}
                 to={new Date(2024, 9)}
-                role="Software Developer"
-                achievements={[
-                    "Mentored junior developers to develop in-house Rust expertise",
-                    "Spiked and iterated on product ideas to streamline customer adoption",
-                    "Built custom integrations for seamless communication with external services",
-                ]}
-            />
-            <Position
-                org="Redjack"
+            >
+                <Position role="Software Developer">
+                    <li>
+                        Mentored junior developers to develop in-house Rust
+                        expertise
+                    </li>
+                    <li>
+                        Spiked and iterated on product ideas to streamline
+                        customer adoption
+                    </li>
+                    <li>
+                        Built custom integrations for seamless communication
+                        with external services
+                    </li>
+                </Position>
+            </Org>
+            <Org
+                name="Redjack"
                 from={new Date(2023, 3)}
                 to={new Date(2023, 11)}
-                role="Senior Rust Engineer"
-                achievements={[
-                    "Re-architected final stage of multi-step data pipeline to highlight action items",
-                    "Refined serialized data format to save bandwidth during transmission",
-                    "Implemented asynchronous APIs for efficient and parallel operations",
-                ]}
-            />
-            <Position
-                org="Cloudflare"
+            >
+                <Position role="Senior Rust Engineer">
+                    <li>
+                        Re-architected final stage of multi-step data pipeline
+                        to highlight action items
+                    </li>
+                    <li>
+                        Refined serialized data format to save bandwidth during
+                        transmission
+                    </li>
+                    <li>
+                        Implemented asynchronous APIs for efficient and parallel
+                        operations
+                    </li>
+                </Position>
+            </Org>
+            <Org
+                name="Cloudflare"
                 from={new Date(2021, 1)}
                 to={new Date(2023, 1)}
-                positions={[
-                    {
-                        role: "Systems Engineer, Workers Experiences",
-                        achievements: [
-                            "Designed and built out bespoke build infrastructure for multiple projects",
-                            "Took on a mentorship role to both internal and external contributors",
-                            "Led design, implementation, and communication for deprecation effort",
-                        ],
-                    },
-                    {
-                        role: "Systems Engineer, Developer Productivity",
-                        achievements: [
-                            "Spearheaded backwards-compatibility effort in major software rewrite",
-                            "Drove major product features to completion involving multiple services",
-                            "Provided support for multiple product areas across the stack",
-                        ],
-                    },
-                ]}
-            />
-            <Position
-                org="Cheff"
-                from={new Date(2020, 2)}
-                to={new Date(2020, 5)}
-                role="Frontend Engineer"
-                achievements={[
-                    "Refactored existing React/Typescript codebase to adapt to client needs",
-                    "Iterated quickly and effectively on product requirement updates",
-                    "Implemented features across Amazon Web Services backend and UI",
-                ]}
-            />
+            >
+                <Position role="Systems Engineer, Workers Experiences">
+                    <li>
+                        Designed and built out bespoke build infrastructure for
+                        multiple projects
+                    </li>
+                    <li>
+                        Took on a mentorship role to both internal and external
+                        contributors
+                    </li>
+                    <li>
+                        Led design, implementation, and communication for
+                        deprecation effort
+                    </li>
+                </Position>
+                <Position role="Systems Engineer, Developer Productivity">
+                    <li>
+                        Spearheaded backwards-compatibility effort in major
+                        software rewrite
+                    </li>
+                    <li>
+                        Drove major product features to completion involving
+                        multiple services
+                    </li>
+                    <li>
+                        Provided support for multiple product areas across the
+                        stack
+                    </li>
+                </Position>
+            </Org>
+            <Org name="Cheff" from={new Date(2020, 2)} to={new Date(2020, 5)}>
+                <Position role="Frontend Engineer">
+                    <li>
+                        Refactored existing React/Typescript codebase to adapt
+                        to client needs
+                    </li>
+                    <li>
+                        Iterated quickly and effectively on product requirement
+                        updates
+                    </li>
+                    <li>
+                        Implemented features across Amazon Web Services backend
+                        and UI
+                    </li>
+                </Position>
+            </Org>
         </Section>
         <Section title="Education">
-            <Position
-                org="Georgia Institute of Technology"
+            <Org
+                name="Georgia Institute of Technology"
                 from={new Date(2017, 7)}
                 to={new Date(2019, 4)}
-                achievements={[
-                    "Led both Visualization and Platform teams in the Big Data Club",
-                    "Pioneered infrastructure partnership between Georgia Tech and Google Cloud",
-                ]}
-            />
+            >
+                <Position>
+                    <li>
+                        Led both Visualization and Platform teams in the Big
+                        Data Club
+                    </li>
+                    <li>
+                        Pioneered infrastructure partnership between Georgia
+                        Tech and Google Cloud
+                    </li>
+                </Position>
+            </Org>
         </Section>
         <Section title="Research">
-            <Position
-                org="Georgia Emerging Infections Program"
+            <Org
+                name="Georgia Emerging Infections Program"
                 from={new Date(2017, 5)}
                 to={new Date(2018, 3)}
-                achievements={[
-                    "Identified healthcare facilities with statistically significant infection rates",
-                    "Cleaned, merged, analyzed, and visualized data across multiple domains",
-                    "Presented findings as a closing speaker at the SHEA 2018 conference",
-                    // <>
-                    //     Published in{" "}
-                    //     <span class="italic">Clinical Infectious Diseases</span>
-                    //     (https://doi.org/10.1093/cid/ciz154)
-                    // </>,
-                ]}
-            />
+            >
+                <Position>
+                    <li>
+                        Identified healthcare facilities with statistically
+                        significant infection rates
+                    </li>
+                    <li>
+                        Cleaned, merged, analyzed, and visualized data across
+                        multiple domains
+                    </li>
+                    <li>
+                        Presented findings as a closing speaker at the SHEA 2018
+                        conference
+                    </li>
+                    <li>
+                        Published in{" "}
+                        <span class="italic">Clinical Infectious Diseases</span>
+                        (<a href="https://doi.org/10.1093/cid/ciz154"
+                            >https://doi.org/10.1093/cid/ciz154</a
+                        >)
+                    </li>,
+                </Position>
+            </Org>
         </Section>
     </main>
 </Layout>

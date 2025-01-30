@@ -1,0 +1,49 @@
+---
+type Props = {
+    name: string;
+    from: Date;
+    to: Date;
+};
+
+const formatTimeFrame = ({ from, to }: { from: Date; to: Date }) => {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+        year: "numeric",
+        month: "short",
+    });
+
+    return `${formatter.format(from)} – ${formatter.format(to)}`;
+};
+
+const { name, from, to } = Astro.props;
+const timeframe = formatTimeFrame({ from, to });
+---
+
+<section>
+    <header>
+        <h3>
+            <span>{name}</span>
+            <span>{timeframe}</span>
+        </h3>
+    </header>
+    <section>
+        <slot />
+    </section>
+</section>
+
+<style>
+    h3 {
+        margin: 0;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+    }
+
+    h4 {
+        margin: 0;
+    }
+
+    ul {
+        margin-top: 0;
+        margin-bottom: 0.75rem;
+    }
+</style>

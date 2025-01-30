@@ -1,80 +1,14 @@
 ---
-type Position = {
+interface Props {
     role?: string;
-    achievements:
-        | [string, string]
-        | [string, string, string]
-        | [string, string, string, string];
-};
+}
 
-type Props = {
-    org: string;
-    from: Date;
-    to: Date;
-} & (Position | { positions: Position[] });
-
-const heldSinglePosition = (
-    x: Position | { positions: Position[] },
-): x is Position => "achievements" in x;
-
-const toPositionsList = (
-    oneOrMorePositions: Position | { positions: Position[] },
-) =>
-    heldSinglePosition(oneOrMorePositions)
-        ? [oneOrMorePositions]
-        : oneOrMorePositions.positions;
-
-const formatTimeFrame = ({ from, to }: { from: Date; to: Date }) => {
-    const formatter = new Intl.DateTimeFormat("en-US", {
-        year: "numeric",
-        month: "short",
-    });
-
-    return `${formatter.format(from)} – ${formatter.format(to)}`;
-};
-
-const { org, from, to, ...oneOrMorePositions } = Astro.props;
-const positions = toPositionsList(oneOrMorePositions);
-const timeframe = formatTimeFrame({ from, to });
+const { role } = Astro.props;
 ---
 
-<section class="wrapper">
-    <header>
-        <h3>
-            <span>{org}</span>
-            <span>{timeframe}</span>
-        </h3>
-    </header>
-    <section class="outer">
-        {
-            positions.map(({ role, achievements }) => (
-                <section class="inner">
-                    {role !== undefined ? <h4>{role}</h4> : null}
-                    <ul>
-                        {achievements.map((text) => (
-                            <li>{text}</li>
-                        ))}
-                    </ul>
-                </section>
-            ))
-        }
-    </section>
+<section>
+    {role !== undefined ? <h4>{role}</h4> : null}
+    <ul>
+        <slot />
+    </ul>
 </section>
-
-<style>
-    h3 {
-        margin: 0;
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
-    }
-
-    h4 {
-        margin: 0;
-    }
-
-    ul {
-        margin-top: 0;
-        margin-bottom: 0.75rem;
-    }
-</style>
