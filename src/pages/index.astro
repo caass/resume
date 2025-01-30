@@ -16,10 +16,10 @@ import "@fontsource/atkinson-hyperlegible";
         <h1>Cass Fridkin</h1>
         <address>
             <IconLink href="https://linkedin.com/in/caass" icon="linkedin">
-                linkedin://caass
+                caass
             </IconLink>
             <IconLink href="https://github.com/caass" icon="github">
-                github://caass
+                caass
             </IconLink>
             <ContactLink
                 phoneNumber={PHONE_NUMBER}
@@ -86,6 +86,34 @@ import "@fontsource/atkinson-hyperlegible";
                 ]}
             />
         </Section>
+        <Section title="Education">
+            <Position
+                org="Georgia Institute of Technology"
+                from={new Date(2017, 7)}
+                to={new Date(2019, 4)}
+                achievements={[
+                    "Led both Visualization and Platform teams in the Big Data Club",
+                    "Pioneered infrastructure partnership between Georgia Tech and Google Cloud",
+                ]}
+            />
+        </Section>
+        <Section title="Research">
+            <Position
+                org="Georgia Emerging Infections Program"
+                from={new Date(2017, 5)}
+                to={new Date(2018, 3)}
+                achievements={[
+                    "Identified healthcare facilities with statistically significant infection rates",
+                    "Cleaned, merged, analyzed, and visualized data across multiple domains",
+                    "Presented findings as a closing speaker at the SHEA 2018 conference",
+                    // <>
+                    //     Published in{" "}
+                    //     <span class="italic">Clinical Infectious Diseases</span>
+                    //     (https://doi.org/10.1093/cid/ciz154)
+                    // </>,
+                ]}
+            />
+        </Section>
     </main>
 </Layout>
 
@@ -98,5 +126,9 @@ import "@fontsource/atkinson-hyperlegible";
 
     h1 {
         margin: 0;
+    }
+
+    .italic {
+        font-style: italic;
     }
 </style>

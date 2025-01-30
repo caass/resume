@@ -1,5 +1,11 @@
 ---
-type Position = { role: string; achievements: [string, string, string] };
+type Position = {
+    role?: string;
+    achievements:
+        | [string, string]
+        | [string, string, string]
+        | [string, string, string, string];
+};
 
 type Props = {
     org: string;
@@ -9,7 +15,7 @@ type Props = {
 
 const heldSinglePosition = (
     x: Position | { positions: Position[] },
-): x is Position => "role" in x;
+): x is Position => "achievements" in x;
 
 const toPositionsList = (
     oneOrMorePositions: Position | { positions: Position[] },
@@ -43,7 +49,7 @@ const timeframe = formatTimeFrame({ from, to });
         {
             positions.map(({ role, achievements }) => (
                 <section class="inner">
-                    <h4>{role}</h4>
+                    {role !== undefined ? <h4>{role}</h4> : null}
                     <ul>
                         {achievements.map((text) => (
                             <li>{text}</li>
