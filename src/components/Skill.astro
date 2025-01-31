@@ -1,12 +1,24 @@
 ---
 interface Props {
     category: string;
+    longest?: boolean;
 }
 
-const { category } = Astro.props;
+const { category, longest } = Astro.props;
 ---
 
 <section>
     <h3>{category}</h3>
     <span><slot /></span>
 </section>
+
+<style>
+    section {
+        display: flex;
+        align-items: baseline;
+    }
+
+    h3 {
+        margin: 0;
+    }
+</style>
