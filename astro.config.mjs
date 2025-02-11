@@ -26,6 +26,7 @@ export default defineConfig({
           ensurePath: true,
           throwOnFail: true,
           isolated: true,
+          pdf: { margin: { top: 30 } },
         },
       },
     }),
