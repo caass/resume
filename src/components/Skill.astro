@@ -17,7 +17,7 @@ const { category, ...props } = Astro.props;
     section {
         display: grid;
         grid-column: category-start / items-end;
-        grid-row: `${category}-start`;
+        grid-row: auto;
         grid-template-rows: subgrid;
         grid-template-columns: subgrid;
 
