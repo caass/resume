@@ -174,16 +174,7 @@ import "@fontsource/atkinson-hyperlegible";
                 </Position>
             </Org>
         </Section>
-        <Section
-            title="Skills"
-            style={{
-                display: "grid",
-                gridTemplateColumns:
-                    "[category-start] min-content [category-end items-start] 1fr [items-end]",
-                gridTemplateRows:
-                    "[languages-start] 1fr [languages-end concepts-start] 1fr [concepts-end]",
-            }}
-        >
+        <Section title="Skills" class="skills">
             <Skill category="Languages">
                 Rust, JavaScript (Typescript/JSX), Go
             </Skill>
@@ -207,5 +198,15 @@ import "@fontsource/atkinson-hyperlegible";
 
     .italic {
         font-style: italic;
+    }
+
+    .skills {
+        display: grid;
+        grid-template-columns:
+            [category-start] min-content [category-end
+            items-start] 1fr [items-end];
+        grid-template-rows:
+            [languages-start] 1fr [languages-end concepts-start]
+            1fr [concepts-end];
     }
 </style>
