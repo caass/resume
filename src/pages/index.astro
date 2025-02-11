@@ -174,8 +174,17 @@ import "@fontsource/atkinson-hyperlegible";
                 </Position>
             </Org>
         </Section>
-        <Section title="Skills">
-            <Skill category="Languages" longest>
+        <Section
+            title="Skills"
+            style={{
+                display: "grid",
+                gridTemplateColumns:
+                    "[category-start] min-content [category-end items-start] 1fr [items-end]",
+                gridTemplateRows:
+                    "[languages-start] 1fr [languages-end concepts-start] 1fr [concepts-end]",
+            }}
+        >
+            <Skill category="Languages">
                 Rust, JavaScript (Typescript/JSX), Go
             </Skill>
             <Skill category="Concepts">
