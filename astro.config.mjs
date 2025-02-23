@@ -2,7 +2,6 @@
 import { defineConfig, envField } from "astro/config";
 
 import icon from "astro-icon";
-
 import pdf from "astro-pdf";
 
 // https://astro.build/config
