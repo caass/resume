@@ -2,6 +2,8 @@
   "name": "resume",
   "type": "module",
   "version": "0.0.1",
+  "private": true,
+  "license": "PPL",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build && open ./dist/resume.pdf",
