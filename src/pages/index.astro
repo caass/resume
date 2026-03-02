@@ -1,5 +1,6 @@
 ---
 import { PHONE_NUMBER, EMAIL_ADDRESS } from "astro:env/server";
+import { getCollection, render } from "astro:content";
 
 import Layout from "../layouts/Layout.astro";
 
@@ -8,9 +9,69 @@ import Position from "../components/Position.astro";
 import Section from "../components/Section.astro";
 import IconLink from "../components/IconLink.astro";
 import ContactLink from "../components/ContactLink.astro";
+import ArrowLink from "../components/ArrowLink.astro";
 import Org from "../components/Org.astro";
 
 import "@fontsource/atkinson-hyperlegible";
+
+const allPositions = await getCollection("positions");
+const allSkills = await getCollection("skills");
+
+// Pre-render all position entries
+const entries = await Promise.all(
+    allPositions.map(async (entry) => ({
+        id: entry.id,
+        data: entry.data,
+        rendered: await render(entry),
+    })),
+);
+
+// Group into sections -> orgs -> positions
+interface OrgGroup {
+    name: string;
+    from: Date;
+    to: Date;
+    positions: {
+        role?: string;
+        Content: Awaited<ReturnType<typeof render>>["Content"];
+    }[];
+}
+
+const sectionOrder = ["experience", "education", "research"] as const;
+
+const sections = sectionOrder.map((sectionId) => {
+    // Sort entries: by from desc, then by id desc (for position order within an org)
+    const sectionEntries = entries
+        .filter((e) => e.data.section === sectionId)
+        .sort(
+            (a, b) =>
+                b.data.from.getTime() - a.data.from.getTime() ||
+                b.id.localeCompare(a.id),
+        );
+
+    // Group by org identity (name + date range)
+    const orgMap = new Map<string, OrgGroup>();
+    for (const entry of sectionEntries) {
+        const key = `${entry.data.org}-${entry.data.from.getTime()}-${entry.data.to.getTime()}`;
+        if (!orgMap.has(key)) {
+            orgMap.set(key, {
+                name: entry.data.org,
+                from: entry.data.from,
+                to: entry.data.to,
+                positions: [],
+            });
+        }
+        orgMap.get(key)!.positions.push({
+            role: entry.data.role,
+            Content: entry.rendered.Content,
+        });
+    }
+
+    return {
+        title: sectionId.charAt(0).toUpperCase() + sectionId.slice(1),
+        orgs: [...orgMap.values()],
+    };
+});
 ---
 
 <Layout>
@@ -30,169 +91,31 @@ import "@fontsource/atkinson-hyperlegible";
         </address>
     </header>
     <main>
-        <Section title="Experience">
-            <Org
-                name="Trace Machina"
-                from={new Date(2024, 4)}
-                to={new Date(2024, 9)}
-            >
-                <Position role="Software Developer">
-                    <li>
-                        Mentored junior developers to develop in-house expertise
-                    </li>
-                    <li>
-                        Designed and contributed documentation written with Qwik
-                        and Astro
-                    </li>
-                    <li>
-                        Drove implementation of major gRPC APIs in asynchronous
-                        Rust codebase
-                    </li>
-                </Position>
-            </Org>
-            <Org
-                name="Redjack"
-                from={new Date(2023, 3)}
-                to={new Date(2023, 11)}
-            >
-                <Position role="Senior Rust Engineer">
-                    <li>
-                        Re-architected final stage of multi-step data pipeline
-                        to highlight action items
-                    </li>
-                    <li>
-                        Refined serialized data format to save bandwidth during
-                        transmission
-                    </li>
-                    <li>
-                        Identified and removed bottlenecks in asynchronous
-                        Rust/Tokio code
-                    </li>
-                </Position>
-            </Org>
-            <Org
-                name="Cloudflare"
-                from={new Date(2021, 1)}
-                to={new Date(2023, 1)}
-            >
-                <Position role="Systems Engineer, Workers Experiences">
-                    <li>
-                        Drafted and published <IconLink
-                            right
-                            icon="square-arrow-out-up-right"
-                            href="https://developers.cloudflare.com/workers/wrangler/migration/v1-to-v2/eject-webpack/"
-                            target="_blank">docs</IconLink
-                        > and <IconLink
-                            right
-                            icon="square-arrow-out-up-right"
-                            href="https://blog.cloudflare.com/deprecating-wrangler-v1/"
-                            target="_blank">blog post</IconLink
-                        > on major product upgrade
-                    </li>
-                    <li>
-                        Took on a mentorship role to both internal and external
-                        contributors
-                    </li>
-                    <li>
-                        Designed and built out bespoke build infrastructure for
-                        multiple projects
-                    </li>
-                </Position>
-                <Position role="Systems Engineer, Developer Productivity">
-                    <li>
-                        Communicated implementation details in legacy codebase
-                        during software rewrite
-                    </li>
-                    <li>
-                        Wrote and executed on design, product requirements, and
-                        specification documents
-                    </li>
-                    <li>
-                        Contributed productively web, API, and low-level systems
-                        codebases
-                    </li>
-                </Position>
-            </Org>
-            <Org name="Cheff" from={new Date(2020, 2)} to={new Date(2020, 5)}>
-                <Position role="Frontend Engineer">
-                    <li>
-                        Refactored existing React/Typescript codebase to adapt
-                        to client needs
-                    </li>
-                    <li>
-                        Iterated quickly and effectively on product requirement
-                        updates
-                    </li>
-                    <li>
-                        Implemented features across Amazon Web Services backend
-                        and UI
-                    </li>
-                </Position>
-            </Org>
-        </Section>
-        <Section title="Education">
-            <Org
-                name="Georgia Institute of Technology"
-                from={new Date(2017, 7)}
-                to={new Date(2019, 4)}
-            >
-                <Position>
-                    <li>
-                        Led both Visualization and Platform teams in the Big
-                        Data Club
-                    </li>
-                    <li>
-                        Pioneered infrastructure partnership between Georgia
-                        Tech and Google Cloud
-                    </li>
-                </Position>
-            </Org>
-        </Section>
-        <Section title="Research">
-            <Org
-                name="Georgia Emerging Infections Program"
-                from={new Date(2017, 5)}
-                to={new Date(2018, 3)}
-            >
-                <Position>
-                    <li>
-                        Identified healthcare facilities with statistically
-                        significant infection rates
-                    </li>
-                    <li>
-                        Cleaned, merged, analyzed, and visualized data across
-                        multiple domains
-                    </li>
-                    <li>
-                        Presented findings clearly and comprehensively as
-                        closing speaker at SHEA 2018
-                    </li>
-                    <li>
-                        Published in <em class="italic"
-                            >Clinical Infectious Diseases</em
-                        > (<IconLink
-                            right
-                            icon="square-arrow-out-up-right"
-                            href="https://doi.org/10.1093/cid/ciz154"
-                            target="_blank"
-                        >
-                            https://doi.org/10.1093/cid/ciz154
-                        </IconLink>)
-                    </li>
-                </Position>
-            </Org>
-        </Section>
+        {
+            sections.map((section) => (
+                <Section title={section.title}>
+                    {section.orgs.map((org) => (
+                        <Org name={org.name} from={org.from} to={org.to}>
+                            {org.positions.map(({ role, Content }) => (
+                                <Position role={role}>
+                                    <Content
+                                        components={{ a: ArrowLink }}
+                                    />
+                                </Position>
+                            ))}
+                        </Org>
+                    ))}
+                </Section>
+            ))
+        }
         <Section title="Skills" class="skills">
-            <Skill category="Languages">
-                Typescript, JavaScript, CSS & Sass, Rust, Go, Markdown
-            </Skill>
-            <Skill category="Tools">
-                JSX, React/Next, Qwik, Astro, Vite/Rollup/Webpack
-            </Skill>
-            <Skill category="Concepts">
-                Serverless paradigms, reactivity models, building & bundling,
-                UI/UX
-            </Skill>
+            {
+                allSkills.map((skill) => (
+                    <Skill category={skill.data.category}>
+                        {skill.data.items.join(", ")}
+                    </Skill>
+                ))
+            }
         </Section>
     </main>
 </Layout>
@@ -207,10 +130,6 @@ import "@fontsource/atkinson-hyperlegible";
     h1 {
         margin: 0;
         font-weight: normal;
-    }
-
-    em.italic {
-        font-style: italic;
     }
 
     .skills {

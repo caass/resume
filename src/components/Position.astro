@@ -8,9 +8,7 @@ const { role } = Astro.props;
 
 <section>
     {role !== undefined ? <h4>{role}</h4> : null}
-    <ul>
-        <slot />
-    </ul>
+    <slot />
 </section>
 
 <style>
@@ -19,7 +17,7 @@ const { role } = Astro.props;
         font-style: italic;
         font-weight: normal;
     }
-    ul {
+    section :global(ul) {
         margin: 0;
     }
 </style>

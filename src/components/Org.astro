@@ -9,6 +9,7 @@ const formatTimeFrame = ({ from, to }: { from: Date; to: Date }) => {
     const formatter = new Intl.DateTimeFormat("en-US", {
         year: "numeric",
         month: "short",
+        timeZone: "UTC",
     });
 
     return `${formatter.format(from)} – ${formatter.format(to)}`;

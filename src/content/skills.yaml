@@ -1,0 +1,24 @@
+- id: languages
+  category: Languages
+  items:
+    - Typescript
+    - JavaScript
+    - CSS & Sass
+    - Rust
+    - Go
+    - Markdown
+- id: tools
+  category: Tools
+  items:
+    - JSX
+    - React/Next
+    - Qwik
+    - Astro
+    - Vite/Rollup/Webpack
+- id: concepts
+  category: Concepts
+  items:
+    - Serverless paradigms
+    - reactivity models
+    - building & bundling
+    - UI/UX
