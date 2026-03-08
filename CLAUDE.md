@@ -2,35 +2,43 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## What This Is
+## Project Overview
 
-An Astro-based resume site that renders to PDF via Puppeteer (astro-pdf). Single-page resume with positions in MDX, skills in YAML, and automated PDF output.
+An Astro-based resume that renders to PDF. Resume content lives in MDX and YAML files; Astro builds a static HTML page, then Puppeteer (via `astro-pdf`) converts it to a PDF at `dist/resume.pdf`.
 
 ## Commands
 
-- `pnpm dev` — Start dev server
-- `pnpm build` — Build site and open generated `dist/resume.pdf`
+- `pnpm build` — Build the site and open the resulting PDF
+- `pnpm dev` — Build once, then rebuild on file changes (watches `src/`)
+- `pnpm astro check` — TypeScript type checking
 
-No lint or test commands are configured.
+No test suite exists.
+
+## Environment Variables
+
+Optional env vars defined in `astro.config.mjs` via `envField`:
+
+- `PHONE_NUMBER` (number) — phone number shown on resume
+- `EMAIL_ADDRESS` (string) — email shown on resume
+
+These are server-side, sourced from `.env`.
 
 ## Architecture
 
-**Entry point:** `src/pages/index.astro` — Fetches all content collections, sorts/groups positions by section → org → role, and renders the full resume.
+**Content collections** (`src/content.config.ts`):
 
-**Content collections** (defined in `src/content/content.config.ts`):
+- `positions` — MDX files in `src/content/positions/`, each with frontmatter: `section` (experience/education/research), `org`, `from`, `to`, and optional `role`. Multiple positions can share the same org and date range to group under one org heading.
+- `skills` — Single YAML file at `src/content/skills.yaml` with `category` and `items` arrays.
 
-- `positions/` — MDX files with frontmatter: `section` (experience|education|research), `org`, `from`, `to` (date or "Present"), optional `role`. Body is bullet-point content rendered as HTML.
-- `skills.yaml` — Array of `{id, category, items[]}`.
+**Rendering pipeline** (`src/pages/index.astro`):
 
-**Components:** `Section`, `Org`, `Position` form the hierarchy. `ArrowLink`, `ContactLink`, `IconLink`, `Skill` are leaf components.
+- Positions are grouped by section (experience → research → education), then by org identity (org name + date range). Links in MDX content render via the `ArrowLink` component.
+- The page is a single-page layout (`src/layouts/Layout.astro`) using Atkinson Hyperlegible font, max-width 40rem.
 
-**Environment variables** (`PHONE_NUMBER`, `EMAIL_ADDRESS`): Optional, server-context only. Defined in `.env` and schema'd in `astro.config.mjs`. Contact links render conditionally based on presence.
+**PDF generation** (`astro-pdf` integration in `astro.config.mjs`):
 
-## Key Details
+- Converts the `/` route to `resume.pdf` with a 30px top margin.
 
-- **Package manager:** pnpm
-- **PDF generation:** Configured in `astro.config.mjs` via astro-pdf/Puppeteer with 30px top margin
-- **Font:** Atkinson Hyperlegible (@fontsource)
-- **Icons:** Lucide via astro-icon
-- **Styling:** Component-scoped CSS, CSS subgrid for skills layout
-- **Use `trash` instead of `rm -r`** for deleting files/directories
+## Adding Content
+
+To add a new position, create a `.mdx` file in `src/content/positions/` with the required frontmatter schema. To add skills, edit `src/content/skills.yaml`.
