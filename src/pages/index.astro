@@ -37,7 +37,7 @@ interface OrgGroup {
   }[];
 }
 
-const sectionOrder = ["experience", "education", "research"] as const;
+const sectionOrder = ["experience", "research", "education"] as const;
 
 const sections = sectionOrder.map((sectionId) => {
   // Sort entries: by from desc, then by id desc (for position order within an org)

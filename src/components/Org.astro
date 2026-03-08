@@ -1,9 +1,13 @@
 ---
-type Props = {
-  name: string;
-  from: Date;
-  to: Date | "Present";
-};
+const fullFormatter = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "short",
+  timeZone: "UTC",
+});
+const monthFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  timeZone: "UTC",
+});
 
 const formatTimeFrame = ({
   from,
@@ -12,24 +16,31 @@ const formatTimeFrame = ({
   from: Date;
   to: Date | "Present";
 }) => {
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    year: "numeric",
-    month: "short",
-    timeZone: "UTC",
-  });
+  const toDate = to instanceof Date ? to : new Date();
+  const sameYear = from.getUTCFullYear() === toDate.getUTCFullYear();
 
-  return `${formatter.format(from)} – ${to instanceof Date ? formatter.format(to) : to}`;
+  const fromStr = sameYear
+    ? monthFormatter.format(from)
+    : fullFormatter.format(from);
+  const toStr = to instanceof Date ? fullFormatter.format(to) : to;
+
+  return `${fromStr} – ${toStr}`;
+};
+
+type Props = {
+  name: string;
+  from: Date;
+  to: Date | "Present";
 };
 
 const { name, from, to } = Astro.props;
-const timeframe = formatTimeFrame({ from, to });
 ---
 
 <section>
   <header>
     <h3>
       <span>{name}</span>
-      <span>{timeframe}</span>
+      <span>{formatTimeFrame({ from, to })}</span>
     </h3>
   </header>
   <section>
