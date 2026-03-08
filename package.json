@@ -13,7 +13,7 @@
     "@astrojs/check": "^0.9.6",
     "@astrojs/mdx": "^4.3.13",
     "@fontsource/atkinson-hyperlegible": "^5.2.8",
-    "@iconify-json/lucide": "^1.2.95",
+    "@iconify-json/lucide": "^1.2.96",
     "astro": "^5.18.0",
     "astro-icon": "^1.1.5",
     "astro-pdf": "^1.7.2",
