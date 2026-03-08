@@ -5,7 +5,7 @@
   "private": true,
   "license": "PPL",
   "scripts": {
-    "dev": "astro dev",
+    "dev": "pnpm build && chokidar 'src/**/*' -c 'pnpm build'",
     "build": "astro build && open ./dist/resume.pdf",
     "astro": "astro"
   },
@@ -18,5 +18,8 @@
     "astro-icon": "^1.1.5",
     "astro-pdf": "^1.7.2",
     "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "chokidar-cli": "^3.0.0"
   }
 }
