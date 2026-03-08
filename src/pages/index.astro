@@ -19,123 +19,116 @@ const allSkills = await getCollection("skills");
 
 // Pre-render all position entries
 const entries = await Promise.all(
-    allPositions.map(async (entry) => ({
-        id: entry.id,
-        data: entry.data,
-        rendered: await render(entry),
-    })),
+  allPositions.map(async (entry) => ({
+    id: entry.id,
+    data: entry.data,
+    rendered: await render(entry),
+  })),
 );
 
 // Group into sections -> orgs -> positions
 interface OrgGroup {
-    name: string;
-    from: Date;
-    to: Date;
-    positions: {
-        role?: string;
-        Content: Awaited<ReturnType<typeof render>>["Content"];
-    }[];
+  name: string;
+  from: Date;
+  to: Date | "Present";
+  positions: {
+    role?: string;
+    Content: Awaited<ReturnType<typeof render>>["Content"];
+  }[];
 }
 
 const sectionOrder = ["experience", "education", "research"] as const;
 
 const sections = sectionOrder.map((sectionId) => {
-    // Sort entries: by from desc, then by id desc (for position order within an org)
-    const sectionEntries = entries
-        .filter((e) => e.data.section === sectionId)
-        .sort(
-            (a, b) =>
-                b.data.from.getTime() - a.data.from.getTime() ||
-                b.id.localeCompare(a.id),
-        );
+  // Sort entries: by from desc, then by id desc (for position order within an org)
+  const sectionEntries = entries
+    .filter((e) => e.data.section === sectionId)
+    .sort(
+      (a, b) =>
+        b.data.from.getTime() - a.data.from.getTime() ||
+        b.id.localeCompare(a.id),
+    );
 
-    // Group by org identity (name + date range)
-    const orgMap = new Map<string, OrgGroup>();
-    for (const entry of sectionEntries) {
-        const key = `${entry.data.org}-${entry.data.from.getTime()}-${entry.data.to.getTime()}`;
-        if (!orgMap.has(key)) {
-            orgMap.set(key, {
-                name: entry.data.org,
-                from: entry.data.from,
-                to: entry.data.to,
-                positions: [],
-            });
-        }
-        orgMap.get(key)!.positions.push({
-            role: entry.data.role,
-            Content: entry.rendered.Content,
-        });
+  // Group by org identity (name + date range)
+  const orgMap = new Map<string, OrgGroup>();
+  for (const entry of sectionEntries) {
+    const key = `${entry.data.org}-${entry.data.from.getTime()}-${entry.data.to instanceof Date ? entry.data.to.getTime() : entry.data.to}`;
+    if (!orgMap.has(key)) {
+      orgMap.set(key, {
+        name: entry.data.org,
+        from: entry.data.from,
+        to: entry.data.to,
+        positions: [],
+      });
     }
+    orgMap.get(key)!.positions.push({
+      role: entry.data.role,
+      Content: entry.rendered.Content,
+    });
+  }
 
-    return {
-        title: sectionId.charAt(0).toUpperCase() + sectionId.slice(1),
-        orgs: [...orgMap.values()],
-    };
+  return {
+    title: sectionId.charAt(0).toUpperCase() + sectionId.slice(1),
+    orgs: [...orgMap.values()],
+  };
 });
 ---
 
 <Layout>
-    <header>
-        <h1>Cass Fridkin</h1>
-        <address>
-            <IconLink href="https://linkedin.com/in/caass" icon="linkedin">
-                caass
-            </IconLink>
-            <IconLink href="https://github.com/caass" icon="github">
-                caass
-            </IconLink>
-            <ContactLink
-                phoneNumber={PHONE_NUMBER}
-                emailAddress={EMAIL_ADDRESS}
-            />
-        </address>
-    </header>
-    <main>
-        {
-            sections.map((section) => (
-                <Section title={section.title}>
-                    {section.orgs.map((org) => (
-                        <Org name={org.name} from={org.from} to={org.to}>
-                            {org.positions.map(({ role, Content }) => (
-                                <Position role={role}>
-                                    <Content
-                                        components={{ a: ArrowLink }}
-                                    />
-                                </Position>
-                            ))}
-                        </Org>
-                    ))}
-                </Section>
-            ))
-        }
-        <Section title="Skills" class="skills">
-            {
-                allSkills.map((skill) => (
-                    <Skill category={skill.data.category}>
-                        {skill.data.items.join(", ")}
-                    </Skill>
-                ))
-            }
+  <header>
+    <h1>Cass Fridkin</h1>
+    <address>
+      <IconLink href="https://linkedin.com/in/caass" icon="linkedin">
+        caass
+      </IconLink>
+      <IconLink href="https://github.com/caass" icon="github"> caass </IconLink>
+      <ContactLink phoneNumber={PHONE_NUMBER} emailAddress={EMAIL_ADDRESS} />
+    </address>
+  </header>
+  <main>
+    {
+      sections.map((section) => (
+        <Section title={section.title}>
+          {section.orgs.map((org) => (
+            <Org name={org.name} from={org.from} to={org.to}>
+              {org.positions.map(({ role, Content }) => (
+                <Position role={role}>
+                  <Content components={{ a: ArrowLink }} />
+                </Position>
+              ))}
+            </Org>
+          ))}
         </Section>
-    </main>
+      ))
+    }
+    <Section title="Skills" class="skills">
+      {
+        allSkills.map((skill) => (
+          <Skill category={skill.data.category}>
+            {skill.data.items.join(", ")}
+          </Skill>
+        ))
+      }
+    </Section>
+  </main>
 </Layout>
 
 <style>
-    address {
-        display: flex;
-        flex-flow: row nowrap;
-        gap: 1rem;
-    }
+  address {
+    display: flex;
+    flex-flow: row nowrap;
+    gap: 1rem;
+  }
 
-    h1 {
-        margin: 0;
-        font-weight: normal;
-    }
+  h1 {
+    margin: 0;
+    font-weight: normal;
+  }
 
-    .skills {
-        display: grid;
-        grid-template-columns:
-            [category-start] min-content [category-end
-            items-start] 1fr [items-end];
-    }
+  .skills {
+    display: grid;
+    grid-template-columns:
+      [category-start] min-content [category-end
+      items-start] 1fr [items-end];
+  }
 </style>

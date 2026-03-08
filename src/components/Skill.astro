@@ -2,34 +2,35 @@
 import type { HTMLAttributes } from "astro/types";
 
 interface Props extends HTMLAttributes<"section"> {
-    category: string;
+  category: string;
 }
 
 const { category, ...props } = Astro.props;
 ---
 
 <section {...props}>
-    <h3>{category}</h3>
-    <span><slot /></span>
+  <h3>{category}</h3>
+  <span><slot /></span>
 </section>
 
 <style>
-    section {
-        display: grid;
-        grid-column: category-start / items-end;
-        grid-row: auto;
-        grid-template-rows: subgrid;
-        grid-template-columns: subgrid;
+  section {
+    display: grid;
+    grid-column: category-start / items-end;
+    grid-row: auto;
+    grid-template-rows: subgrid;
+    grid-template-columns: subgrid;
 
-        align-items: end;
-    }
+    align-items: end;
+  }
 
-    h3 {
-        margin: 0;
-        margin-right: 1rem;
-        align-self: center;
-    }
+  h3 {
+    margin: 0;
+    margin-right: 1rem;
+    align-self: center;
+    font-weight: 400;
+  }
 
-    span {
-    }
+  span {
+  }
 </style>

@@ -1,23 +1,23 @@
 ---
 interface Props {
-    role?: string;
+  role?: string;
 }
 
 const { role } = Astro.props;
 ---
 
 <section>
-    {role !== undefined ? <h4>{role}</h4> : null}
-    <slot />
+  {role !== undefined ? <h4>{role}</h4> : null}
+  <slot />
 </section>
 
 <style>
-    h4 {
-        margin: 0;
-        font-style: italic;
-        font-weight: normal;
-    }
-    section :global(ul) {
-        margin: 0;
-    }
+  h4 {
+    margin: 0;
+    font-style: italic;
+    font-weight: normal;
+  }
+  section :global(ul) {
+    margin: 0;
+  }
 </style>

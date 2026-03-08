@@ -2,53 +2,53 @@
 import IconLink from "./IconLink.astro";
 
 export interface Props {
-    phoneNumber?: number;
-    emailAddress?: string;
+  phoneNumber?: number;
+  emailAddress?: string;
 }
 
 const hasContactInfo = (
-    props: Props,
+  props: Props,
 ): props is { phoneNumber: number; emailAddress: string } =>
-    "phoneNumber" in props &&
-    typeof props.phoneNumber == "number" &&
-    "emailAddress" in props &&
-    typeof props.emailAddress == "string";
+  "phoneNumber" in props &&
+  typeof props.phoneNumber == "number" &&
+  "emailAddress" in props &&
+  typeof props.emailAddress == "string";
 
 const formatPhoneNumber = (
-    phoneNumber: number,
+  phoneNumber: number,
 ): { href: string; display: string } => {
-    const stringified = phoneNumber.toString(10);
-    if (stringified.length !== 10) {
-        throw new Error(
-            "Expected American phone number that's 10 digits long (i.e. no country code).",
-        );
-    }
+  const stringified = phoneNumber.toString(10);
+  if (stringified.length !== 10) {
+    throw new Error(
+      "Expected American phone number that's 10 digits long (i.e. no country code).",
+    );
+  }
 
-    const href = `tel:+1${stringified}`;
-    const display = `(${stringified.slice(0, 3)}) ${stringified.slice(3, 6)}-${stringified.slice(6)}`;
+  const href = `tel:+1${stringified}`;
+  const display = `(${stringified.slice(0, 3)}) ${stringified.slice(3, 6)}-${stringified.slice(6)}`;
 
-    return { href, display };
+  return { href, display };
 };
 
 const props = Astro.props;
 
 const contactLinks = hasContactInfo(props)
-    ? {
-          phoneNumber: formatPhoneNumber(props.phoneNumber),
-          emailAddress: props.emailAddress,
-      }
-    : undefined;
+  ? {
+      phoneNumber: formatPhoneNumber(props.phoneNumber),
+      emailAddress: props.emailAddress,
+    }
+  : undefined;
 ---
 
 {
-    typeof contactLinks !== "undefined" ? (
-        <>
-            <IconLink href={`mailto:${contactLinks.emailAddress}`} icon="mail">
-                {contactLinks.emailAddress}
-            </IconLink>
-            <IconLink href={contactLinks.phoneNumber.href} icon="smartphone">
-                {contactLinks.phoneNumber.display}
-            </IconLink>
-        </>
-    ) : null
+  typeof contactLinks !== "undefined" ? (
+    <>
+      <IconLink href={`mailto:${contactLinks.emailAddress}`} icon="mail">
+        {contactLinks.emailAddress}
+      </IconLink>
+      <IconLink href={contactLinks.phoneNumber.href} icon="smartphone">
+        {contactLinks.phoneNumber.display}
+      </IconLink>
+    </>
+  ) : null
 }

@@ -8,7 +8,7 @@ const positions = defineCollection({
     section: z.enum(["experience", "education", "research"]),
     org: z.string(),
     from: z.coerce.date(),
-    to: z.coerce.date(),
+    to: z.union([z.coerce.date(), z.literal("Present")]),
     role: z.string().optional(),
   }),
 });
