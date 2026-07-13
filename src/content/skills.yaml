@@ -1,16 +1,18 @@
 - id: soft-skills
   category: Soft
   items:
+    - Technical Leadership
+    - Mentorship
     - Conflict Resolution
-    - Education & Upskilling
     - Non-Technical Communication
 - id: hard-skills
   category: Hard
   items:
-    - Concurrency
-    - Reactivity
+    - Distributed Systems
     - Event-Driven Architectures
+    - Concurrency
     - High-Performance
+    - Developer Experience
 - id: languages
   category: Languages
   items:
