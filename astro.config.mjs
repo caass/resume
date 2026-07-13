@@ -5,6 +5,14 @@ import mdx from "@astrojs/mdx";
 import icon from "astro-icon";
 import pdf from "astro-pdf";
 
+// When PUPPETEER_EXECUTABLE_PATH is set (Nix build/devShell), point astro-pdf at
+// that browser and disable Chrome's sandbox so it launches inside the Nix build
+// sandbox. Unset (plain `pnpm dev`/`build`), Puppeteer uses its own browser.
+const pdfExecutable = process.env.PUPPETEER_EXECUTABLE_PATH;
+const launch = pdfExecutable
+  ? { executablePath: pdfExecutable, args: ["--no-sandbox"] }
+  : undefined;
+
 // https://astro.build/config
 export default defineConfig({
   integrations: [
@@ -21,6 +29,7 @@ export default defineConfig({
       },
     }),
     pdf({
+      ...(launch ? { launch } : {}),
       pages: {
         "/": {
           path: "resume.pdf",
