@@ -14,6 +14,16 @@ An Astro-based resume that renders to PDF. Resume content lives in MDX and YAML 
 
 No test suite exists.
 
+### Nix
+
+A flake (`flake.nix`) packages the whole toolchain, so neither `node` nor `pnpm` need to be installed on the host.
+
+- `nix build .` — Build `result/resume.pdf` reproducibly in a hermetic derivation.
+- `nix run .` — Start the Astro dev server against the working tree.
+- `nix develop` — Drop into a shell with `node`, `pnpm`, and a browser on `PATH` (the `.envrc` runs this automatically under direnv).
+
+The build supplies the browser from the Nix store (chromium on Linux, unfree `google-chrome` on macOS where chromium isn't packaged) and points `astro-pdf` at it via `PUPPETEER_EXECUTABLE_PATH`; `.puppeteerrc.cjs` stops Puppeteer from downloading its own. On macOS the derivation exports `CFFIXED_USER_HOME` and launches Chrome with `--use-mock-keychain` so headless Chrome can start inside the Nix builder's homeless daemon-user environment. `pnpm` is pinned to v10 (`fetchPnpmDeps` `fetcherVersion = 3`); the `pnpm.configHook` deprecation warning during the build is expected and harmless.
+
 ## Environment Variables
 
 Optional env vars defined in `astro.config.mjs` via `envField`:
