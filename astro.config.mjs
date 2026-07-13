@@ -10,7 +10,7 @@ import pdf from "astro-pdf";
 // sandbox. Unset (plain `pnpm dev`/`build`), Puppeteer uses its own browser.
 const pdfExecutable = process.env.PUPPETEER_EXECUTABLE_PATH;
 const launch = pdfExecutable
-  ? { executablePath: pdfExecutable, args: ["--no-sandbox"] }
+  ? { executablePath: pdfExecutable, args: ["--no-sandbox", "--use-mock-keychain"] }
   : undefined;
 
 // https://astro.build/config
