@@ -1,26 +1,23 @@
 // @ts-check
-import { readFileSync } from "node:fs";
-
 import { defineConfig, envField } from "astro/config";
+import { loadEnv } from "vite";
 
 import mdx from "@astrojs/mdx";
 import icon from "astro-icon";
 import pdf from "astro-pdf";
 
-// True if `key` has a non-empty value in the environment (covers the vars the
-// Nix build injects) or a non-empty assignment in .env (covers pnpm/npm, where
-// Astro loads .env but doesn't put it on process.env). Kept dependency-free on
-// purpose: `vite`'s loadEnv isn't resolvable as a bare import from this config
-// under pnpm's strict node_modules.
+// Merge .env files with process.env — prefix "" loads every key, not just
+// VITE_-prefixed ones. Covers both the Nix build (contact vars injected into
+// process.env, no .env in the sandbox) and pnpm/npm (Astro loads .env but
+// doesn't put it on process.env). `vite` is a direct dependency pinned to the
+// same range Astro uses, so this dedupes to Astro's own vite (see package.json).
+const env = loadEnv(process.env.NODE_ENV ?? "production", process.cwd(), "");
+
+// True if `key` has a non-empty value in that merged env: a var the Nix build
+// injects, or a non-empty .env assignment.
+/** @param {string} key */
 function contactSet(key) {
-  if (process.env[key]) return true;
-  try {
-    return new RegExp(`^\\s*${key}\\s*=\\s*\\S`, "m").test(
-      readFileSync(".env", "utf8"),
-    );
-  } catch {
-    return false; // no .env (e.g. the Nix build sandbox) — env-only
-  }
+  return Boolean(env[key]);
 }
 
 // Warn (without failing) when the optional contact details are missing, so a
