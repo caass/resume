@@ -1,10 +1,12 @@
-// @ts-check
 import { defineConfig, envField } from "astro/config";
 import { loadEnv } from "vite";
 
 import mdx from "@astrojs/mdx";
 import icon from "astro-icon";
 import pdf from "astro-pdf";
+
+import type { AstroIntegration } from "astro";
+import type { Browser, Page } from "puppeteer";
 
 // Merge .env files with process.env — prefix "" loads every key, not just
 // VITE_-prefixed ones. Covers both the Nix build (contact vars injected into
@@ -15,8 +17,7 @@ const env = loadEnv(process.env.NODE_ENV ?? "production", process.cwd(), "");
 
 // True if `key` has a non-empty value in that merged env: a var the Nix build
 // injects, or a non-empty .env assignment.
-/** @param {string} key */
-function contactSet(key) {
+function contactSet(key: string): boolean {
   return Boolean(env[key]);
 }
 
@@ -24,11 +25,10 @@ function contactSet(key) {
 // build doesn't silently ship a resume with no way to reach you. Runs in the
 // build pipeline via astro:build:start, so it fires however you build — pnpm,
 // npm, or nix.
-function warnMissingContact() {
+function warnMissingContact(): AstroIntegration {
   return {
     name: "warn-missing-contact",
     hooks: {
-      /** @param {{ logger: { warn: (msg: string) => void } }} ctx */
       "astro:build:start": ({ logger }) => {
         const missing = ["PHONE_NUMBER", "EMAIL_ADDRESS"].filter(
           (k) => !contactSet(k),
@@ -58,19 +58,17 @@ const pdfMargin = { top: 30 };
 // a thin iframe wrapper (src/pages/index.astro) pointing at `/resume.pdf`; this
 // middleware renders that PDF on demand from `/raw` (the resume HTML astro-pdf
 // turns into resume.pdf for the build), mirroring astro-pdf's `waitUntil`/margin
-// so the preview matches. Puppeteer is imported lazily so it only loads under
-// `astro dev`, never during the build. Any change under src/ triggers a full
-// reload, which re-requests — and so re-renders — the PDF.
-/** @returns {import("astro").AstroIntegration} */
-function pdfPreview() {
+// so the preview matches. Puppeteer is imported lazily (and as a type-only import
+// above) so it only loads under `astro dev`, never during the build. Any change
+// under src/ triggers a full reload, which re-requests — and so re-renders — it.
+function pdfPreview(): AstroIntegration {
   return {
     name: "pdf-preview",
     hooks: {
       "astro:server:setup": async ({ server, logger }) => {
         const { default: puppeteer } = await import("puppeteer");
 
-        /** @type {import("puppeteer").Browser | undefined} */
-        let browser;
+        let browser: Browser | undefined;
         const getBrowser = async () => {
           if (!browser?.connected) browser = await puppeteer.launch(launch ?? {});
           return browser;
@@ -81,7 +79,7 @@ function pdfPreview() {
           if (new URL(req.url ?? "/", origin).pathname !== "/resume.pdf") {
             return next();
           }
-          let page;
+          let page: Page | undefined;
           try {
             page = await (await getBrowser()).newPage();
             await page.goto(new URL("/raw", origin).href, {
