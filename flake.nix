@@ -91,7 +91,7 @@
               ];
             };
             fetcherVersion = 3;
-            hash = "sha256-LxPKMSvrbv1+HEi7zd45kv2rGkoQF4B7sNRTdfx+dvU=";
+            hash = "sha256-9+Dipbh1PLurXeGJ+s3QkqnhY3MVvL1vgZbd8msAWdI=";
           };
 
           env = {

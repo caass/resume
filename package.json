@@ -5,7 +5,7 @@
   "private": true,
   "license": "PPL",
   "scripts": {
-    "dev": "pnpm build && chokidar 'src/**/*' -c 'pnpm build'",
+    "dev": "astro dev",
     "build": "astro build && open ./dist/resume.pdf",
     "astro": "astro"
   },
@@ -21,6 +21,6 @@
     "vite": "^8.0.13"
   },
   "devDependencies": {
-    "chokidar-cli": "^3.0.0"
+    "puppeteer": "^24.43.1"
   }
 }

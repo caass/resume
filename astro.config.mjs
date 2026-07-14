@@ -51,6 +51,73 @@ const launch = pdfExecutable
   ? { executablePath: pdfExecutable, args: ["--no-sandbox", "--use-mock-keychain"] }
   : undefined;
 
+// Top PDF margin, shared so the dev preview matches the built PDF.
+const pdfMargin = { top: 30 };
+
+// Dev-only: make `astro dev` preview the actual PDF instead of the HTML. `/` is
+// a thin iframe wrapper (src/pages/index.astro) pointing at `/resume.pdf`; this
+// middleware renders that PDF on demand from `/raw` (the resume HTML astro-pdf
+// turns into resume.pdf for the build), mirroring astro-pdf's `waitUntil`/margin
+// so the preview matches. Puppeteer is imported lazily so it only loads under
+// `astro dev`, never during the build. Any change under src/ triggers a full
+// reload, which re-requests — and so re-renders — the PDF.
+/** @returns {import("astro").AstroIntegration} */
+function pdfPreview() {
+  return {
+    name: "pdf-preview",
+    hooks: {
+      "astro:server:setup": async ({ server, logger }) => {
+        const { default: puppeteer } = await import("puppeteer");
+
+        /** @type {import("puppeteer").Browser | undefined} */
+        let browser;
+        const getBrowser = async () => {
+          if (!browser?.connected) browser = await puppeteer.launch(launch ?? {});
+          return browser;
+        };
+
+        server.middlewares.use(async (req, res, next) => {
+          const origin = `http://${req.headers.host}`;
+          if (new URL(req.url ?? "/", origin).pathname !== "/resume.pdf") {
+            return next();
+          }
+          let page;
+          try {
+            page = await (await getBrowser()).newPage();
+            await page.goto(new URL("/raw", origin).href, {
+              waitUntil: "networkidle2",
+            });
+            const buf = await page.pdf({ margin: pdfMargin });
+            res.setHeader("Content-Type", "application/pdf");
+            res.setHeader("Cache-Control", "no-store");
+            res.end(Buffer.from(buf));
+          } catch (err) {
+            const detail = err instanceof Error ? (err.stack ?? err.message) : String(err);
+            logger.error(`render failed\n${detail}`);
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "text/plain");
+            res.end(`PDF render failed:\n${detail}`);
+          } finally {
+            await page?.close().catch(() => {});
+          }
+        });
+
+        // `/` doesn't import the resume content, so content edits wouldn't reload
+        // it on their own. Broadcast a full reload on any src change; the wrapper
+        // reloads and re-fetches /resume.pdf.
+        const reload = () => (server.hot ?? server.ws)?.send({ type: "full-reload" });
+        server.watcher.on("change", (path) => {
+          if (path.includes("/src/")) reload();
+        });
+
+        const close = () => browser?.close().catch(() => {});
+        server.httpServer?.once("close", close);
+        process.once("exit", close);
+      },
+    },
+  };
+}
+
 // https://astro.build/config
 export default defineConfig({
   integrations: [
@@ -70,15 +137,17 @@ export default defineConfig({
     pdf({
       ...(launch ? { launch } : {}),
       pages: {
-        "/": {
+        // The resume HTML lives at /raw; / is the dev PDF-preview wrapper.
+        "/raw": {
           path: "resume.pdf",
           ensurePath: true,
           throwOnFail: true,
           isolated: true,
-          pdf: { margin: { top: 30 } },
+          pdf: { margin: pdfMargin },
         },
       },
     }),
+    pdfPreview(),
   ],
   env: {
     schema: {
