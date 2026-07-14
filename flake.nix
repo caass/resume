@@ -67,7 +67,7 @@
               ./src
               ./package.json
               ./pnpm-lock.yaml
-              ./astro.config.mts
+              ./astro.config.ts
               ./tsconfig.json
               ./.puppeteerrc.cjs
             ];

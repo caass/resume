@@ -4,9 +4,9 @@ import { loadEnv } from "vite";
 import mdx from "@astrojs/mdx";
 import icon from "astro-icon";
 import pdf from "astro-pdf";
+import puppeteer, { type Browser, type Page } from "puppeteer";
 
 import type { AstroIntegration } from "astro";
-import type { Browser, Page } from "puppeteer";
 
 // Merge .env files with process.env — prefix "" loads every key, not just
 // VITE_-prefixed ones. Covers both the Nix build (contact vars injected into
@@ -58,16 +58,19 @@ const pdfMargin = { top: 30 };
 // a thin iframe wrapper (src/pages/index.astro) pointing at `/resume.pdf`; this
 // middleware renders that PDF on demand from `/raw` (the resume HTML astro-pdf
 // turns into resume.pdf for the build), mirroring astro-pdf's `waitUntil`/margin
-// so the preview matches. Puppeteer is imported lazily (and as a type-only import
-// above) so it only loads under `astro dev`, never during the build. Any change
-// under src/ triggers a full reload, which re-requests — and so re-renders — it.
+// so the preview matches. Puppeteer is imported at the top of this file rather
+// than lazily in the hook: Astro loads a TypeScript config through a short-lived
+// Vite module runner that it closes the moment it has read the config, so a
+// deferred `import()` here would hit an already-closed runner. A top-level import
+// resolves while that runner is still open and is captured in the closure — and
+// it costs nothing, since astro-pdf pulls puppeteer in on every build regardless.
+// Any change under src/ triggers a full reload, which re-requests — and so
+// re-renders — the PDF.
 function pdfPreview(): AstroIntegration {
   return {
     name: "pdf-preview",
     hooks: {
-      "astro:server:setup": async ({ server, logger }) => {
-        const { default: puppeteer } = await import("puppeteer");
-
+      "astro:server:setup": ({ server, logger }) => {
         let browser: Browser | undefined;
         const getBrowser = async () => {
           if (!browser?.connected) browser = await puppeteer.launch(launch ?? {});
