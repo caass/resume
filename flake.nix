@@ -34,6 +34,28 @@
 
         pnpm = pkgs.pnpm_10;
 
+        # Contact details for the resume live in the gitignored .env, so they're
+        # neither committed nor visible to the pure flake source. Read them from
+        # the ambient environment instead: `builtins.getEnv` returns "" under the
+        # default pure eval (so a plain `nix build` just omits them — the
+        # astro:env fields are optional), and returns the real values under
+        # `nix build --impure`. Inject only the ones that are set. To bake them
+        # in, run:  set -a; source .env; set +a; nix build --impure
+        resumeEnv = lib.filterAttrs (_: v: v != "") {
+          PHONE_NUMBER = builtins.getEnv "PHONE_NUMBER";
+          EMAIL_ADDRESS = builtins.getEnv "EMAIL_ADDRESS";
+        };
+
+        # astro warns about missing contact details too, but that runs inside the
+        # build sandbox, whose log Nix hides unless the build fails or you pass
+        # `-L`. So also warn at eval time (which always reaches the terminal) when
+        # a var is absent. Under the default pure eval builtins.getEnv returns ""
+        # for both, so a plain `nix build` always reminds you to go impure.
+        missingContact = lib.subtractLists (lib.attrNames resumeEnv) [
+          "PHONE_NUMBER"
+          "EMAIL_ADDRESS"
+        ];
+
         resume = pkgs.stdenv.mkDerivation (finalAttrs: {
           pname = "resume";
           version = "0.0.1";
@@ -76,7 +98,7 @@
             PUPPETEER_EXECUTABLE_PATH = chromePath;
             PUPPETEER_SKIP_DOWNLOAD = "true";
             ASTRO_TELEMETRY_DISABLED = "1";
-          };
+          } // resumeEnv;
 
           buildPhase = ''
             runHook preBuild
@@ -127,7 +149,9 @@
         };
       in
       {
-        packages.default = resume;
+        packages.default = lib.warnIf (missingContact != [ ])
+          "resume: building without ${lib.concatStringsSep " and " missingContact} — the PDF will omit that contact info. Run `set -a; source .env; set +a; nix build --impure` to include it."
+          resume;
 
         apps.default = {
           type = "app";
@@ -139,6 +163,7 @@
             pkgs.nodejs
             pnpm # pnpm_10, matching the package build
             chrome
+            pkgs.just # task runner; see ./justfile (`just` lists recipes)
           ];
           # Point Puppeteer/astro-pdf at the store browser, matching the Nix build.
           PUPPETEER_EXECUTABLE_PATH = chromePath;

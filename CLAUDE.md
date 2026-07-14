@@ -8,21 +8,24 @@ An Astro-based resume that renders to PDF. Resume content lives in MDX and YAML 
 
 ## Commands
 
-- `pnpm build` — Build the site and open the resulting PDF
-- `pnpm dev` — Build once, then rebuild on file changes (watches `src/`)
-- `pnpm astro check` — TypeScript type checking
+This project uses a Nix flake devshell — enter it with `nix develop` (or automatically via direnv). The supported build mechanism is `just build`.
+
+- `just build` — Build `result/resume.pdf`, with contact details from `.env` baked in.
+- `just` — List available recipes.
+- `pnpm dev` — Build once, then rebuild on file changes (watches `src/`).
+- `pnpm astro check` — TypeScript type checking.
 
 No test suite exists.
 
-### Nix
+### How the build works
 
-A flake (`flake.nix`) packages the whole toolchain, so neither `node` nor `pnpm` need to be installed on the host.
+`just build` runs `set -a; . ./.env; set +a; nix build --impure`: it exports the vars in `.env`, then builds the PDF reproducibly in a hermetic Nix derivation.
 
-- `nix build .` — Build `result/resume.pdf` reproducibly in a hermetic derivation.
-- `nix run .` — Start the Astro dev server against the working tree.
-- `nix develop` — Drop into a shell with `node`, `pnpm`, and a browser on `PATH` (the `.envrc` runs this automatically under direnv).
+Contact details (`PHONE_NUMBER`/`EMAIL_ADDRESS`) live in the gitignored `.env`. A pure Nix build can't read untracked files, so the flake reads the two vars via `builtins.getEnv` — empty under the default pure eval, real under `--impure`, which is why `just build` exports `.env` first — and injects only the ones that are set into the derivation's `env`, whence Astro's `loadEnv(mode, dir, "")` picks them up from `process.env` (the fields are optional, so a build without them just omits that contact info). A missing var is warned about (never fatal) on two layers: the `warnMissingContact` integration in `astro.config.mjs` fires during the build itself (its in-sandbox log surfaces only with `-L` or on failure), and `flake.nix` additionally emits an eval-time `lib.warnIf` that always reaches the terminal.
 
-The build supplies the browser from the Nix store (chromium on Linux, unfree `google-chrome` on macOS where chromium isn't packaged) and points `astro-pdf` at it via `PUPPETEER_EXECUTABLE_PATH`; `.puppeteerrc.cjs` stops Puppeteer from downloading its own. On macOS the derivation exports `CFFIXED_USER_HOME` and launches Chrome with `--use-mock-keychain` so headless Chrome can start inside the Nix builder's homeless daemon-user environment. `pnpm` is pinned to v10 (`fetchPnpmDeps` `fetcherVersion = 3`); the `pnpm.configHook` deprecation warning during the build is expected and harmless.
+The flake supplies the browser from the Nix store (chromium on Linux, unfree `google-chrome` on macOS where chromium isn't packaged) and points `astro-pdf` at it via `PUPPETEER_EXECUTABLE_PATH`; `.puppeteerrc.cjs` stops Puppeteer from downloading its own. On macOS the derivation exports `CFFIXED_USER_HOME` and launches Chrome with `--use-mock-keychain` so headless Chrome can start inside the Nix builder's homeless daemon-user environment. `pnpm` is pinned to v10 (`fetchPnpmDeps` `fetcherVersion = 3`); the `pnpm.configHook` deprecation warning during the build is expected and harmless.
+
+`nix run .` starts the Astro dev server against the working tree; `nix develop` drops into a devshell with `node`, `pnpm`, `just`, and a browser on `PATH`.
 
 ## Environment Variables
 
