@@ -1,0 +1,82 @@
+# Résumé positions, grouped by org. Each org holds one or more positions (shared
+# org heading + date range). A bullet is either a plain string, or a list of
+# segments for inline links: a string segment is literal text, an object segment
+# `{ text, href, em? }` renders as an ArrowLink (set `em: true` to italicize).
+- id: bet365
+  section: experience
+  org: bet365
+  from: 2025-05-12
+  to: Present
+  positions:
+    - role: Tech Lead
+      bullets:
+        - Ran day-to-day execution for a team of 6 engineers, including agile ceremonies, process improvements, and on-call response
+        - Turned ambiguous product requirements into scoped MVPs and delivery plans, then led the team in delivering ~18 engineer-month initiatives on time
+        - Overhauled Go test architecture, cutting runtime from 15 minutes to 15 seconds
+        - Grew 4 junior devs to codeowner status through hands-on mentorship
+
+- id: trace-machina
+  section: experience
+  org: Trace Machina
+  from: 2024-05-01
+  to: 2024-10-01
+  positions:
+    - role: Software Developer
+      bullets:
+        - Drove implementation of core gRPC APIs in a high-performance Rust codebase
+        - Designed and built the company's documentation site from scratch (Qwik, Astro)
+
+- id: redjack
+  section: experience
+  org: Redjack
+  from: 2023-04-01
+  to: 2023-12-01
+  positions:
+    - role: Senior Rust Engineer
+      bullets:
+        - Redesigned the serialized wire format, cutting transmission bandwidth 15–20%
+        - Profiled and eliminated bottlenecks in async Rust/Tokio for a ~10x throughput gain
+
+- id: cloudflare
+  section: experience
+  org: Cloudflare
+  from: 2021-02-01
+  to: 2023-02-01
+  positions:
+    - role: Systems Engineer, Workers Experiences
+      bullets:
+        - - "Authored official "
+          - text: migration docs
+            href: "https://developers.cloudflare.com/workers/wrangler/migration/v1-to-v2/eject-webpack/"
+          - " and "
+          - text: launch blog
+            href: "https://blog.cloudflare.com/deprecating-wrangler-v1/"
+          - " for major product upgrade"
+        - Designed and built bespoke build infrastructure for multiple production systems
+    - role: Systems Engineer, Developer Productivity
+      bullets:
+        - Became SME of legacy codebase during ground-up rewrite, unblocking ~8 engineers
+        - Owned design, product-requirement, and specification docs end-to-end
+
+- id: georgia-eip
+  section: research
+  org: Georgia Emerging Infections Program
+  from: 2017-06-01
+  to: 2018-04-01
+  positions:
+    - bullets:
+        - Built an end-to-end pipeline to clean, merge, analyze, and visualize data
+        - Delivered closing talk on novel analytical approaches at SHEA 2018
+        - - "Second author on peer-reviewed study published in "
+          - text: Clinical Infectious Diseases
+            href: "https://doi.org/10.1093/cid/ciz154"
+            em: true
+
+- id: georgia-tech
+  section: education
+  org: Georgia Institute of Technology
+  from: 2017-08-01
+  to: 2019-05-01
+  positions:
+    - bullets:
+        - Founded the infrastructure partnership between Georgia Tech and Google Cloud

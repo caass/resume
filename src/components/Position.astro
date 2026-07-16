@@ -1,14 +1,39 @@
 ---
+import ArrowLink from "./ArrowLink.astro";
+
+type Segment = string | { text: string; href?: string; em?: boolean };
+type Bullet = string | Segment[];
+
 interface Props {
   role?: string;
+  bullets: Bullet[];
 }
 
-const { role } = Astro.props;
+const { role, bullets } = Astro.props;
+
+const segmentsOf = (bullet: Bullet): Segment[] =>
+  typeof bullet === "string" ? [bullet] : bullet;
 ---
 
 <section>
   {role !== undefined ? <h4>{role}</h4> : null}
-  <slot />
+  <ul>
+    {
+      bullets.map((bullet) => (
+        <li>
+          {segmentsOf(bullet).map((seg) => {
+            if (typeof seg === "string") return seg;
+            const text = seg.em ? <em>{seg.text}</em> : seg.text;
+            return seg.href !== undefined ? (
+              <ArrowLink href={seg.href}>{text}</ArrowLink>
+            ) : (
+              text
+            );
+          })}
+        </li>
+      ))
+    }
+  </ul>
 </section>
 
 <style>
@@ -17,7 +42,7 @@ const { role } = Astro.props;
     font-style: italic;
     font-weight: normal;
   }
-  section :global(ul) {
+  ul {
     margin: 0;
   }
 </style>

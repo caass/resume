@@ -1,15 +1,33 @@
 import { defineCollection } from "astro:content";
-import { glob, file } from "astro/loaders";
+import { file } from "astro/loaders";
 import { z } from "astro/zod";
 
+// A bullet is either a plain string or a list of segments. A string segment is
+// literal text; an object segment renders as an ArrowLink (`em` italicizes it).
+const segment = z.union([
+  z.string(),
+  z.object({
+    text: z.string(),
+    href: z.string().optional(),
+    em: z.boolean().optional(),
+  }),
+]);
+const bullet = z.union([z.string(), z.array(segment)]);
+
 const positions = defineCollection({
-  loader: glob({ pattern: "**/*.mdx", base: "./src/content/positions" }),
+  loader: file("src/content/positions.yaml"),
   schema: z.object({
+    id: z.string(),
     section: z.enum(["experience", "education", "research"]),
     org: z.string(),
     from: z.coerce.date(),
     to: z.union([z.coerce.date(), z.literal("Present")]),
-    role: z.string().optional(),
+    positions: z.array(
+      z.object({
+        role: z.string().optional(),
+        bullets: z.array(bullet),
+      }),
+    ),
   }),
 });
 

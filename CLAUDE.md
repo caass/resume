@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-An Astro-based resume that renders to PDF. Resume content lives in MDX and YAML files; Astro builds a static HTML page, then Puppeteer (via `astro-pdf`) converts it to a PDF at `dist/resume.pdf`.
+An Astro-based resume that renders to PDF. Resume content lives in YAML files; Astro builds a static HTML page, then Puppeteer (via `astro-pdf`) converts it to a PDF at `dist/resume.pdf`.
 
 ## Commands
 
@@ -40,12 +40,12 @@ These are server-side, sourced from `.env`.
 
 **Content collections** (`src/content.config.ts`):
 
-- `positions` — MDX files in `src/content/positions/`, each with frontmatter: `section` (experience/education/research), `org`, `from`, `to`, and optional `role`. Multiple positions can share the same org and date range to group under one org heading.
+- `positions` — Single YAML file at `src/content/positions.yaml`, loaded via `file()`. Each entry is an org with `id`, `section` (experience/education/research), `org`, `from`, `to`, and a `positions` array; each nested position has an optional `role` and a `bullets` array. A bullet is either a plain string or a list of segments — a string segment is literal text, an object segment `{ text, href, em? }` renders as an `ArrowLink` (`em: true` italicizes it). This replaces the former per-position MDX files; bullet links are structured data rather than inline markdown.
 - `skills` — Single YAML file at `src/content/skills.yaml` with `category` and `items` arrays.
 
-**Rendering pipeline** (`src/pages/index.astro`):
+**Rendering pipeline** (`src/pages/raw.astro`):
 
-- Positions are grouped by section (experience → research → education), then by org identity (org name + date range). Links in MDX content render via the `ArrowLink` component.
+- Orgs (and their positions) are grouped in the data itself; the page just splits by section (experience → research → education) and orders orgs most-recent-first. `Position.astro` renders each bullet's segments, emitting `ArrowLink` for linked segments.
 - The page is a single-page layout (`src/layouts/Layout.astro`) using Atkinson Hyperlegible font, max-width 40rem.
 
 **PDF generation** (`astro-pdf` integration in `astro.config.ts`):
@@ -54,4 +54,4 @@ These are server-side, sourced from `.env`.
 
 ## Adding Content
 
-To add a new position, create a `.mdx` file in `src/content/positions/` with the required frontmatter schema. To add skills, edit `src/content/skills.yaml`.
+To add a new position, edit `src/content/positions.yaml`: add a new org entry, or append to an existing org's `positions` array. Give links as `{ text, href }` bullet segments. To add skills, edit `src/content/skills.yaml`.
