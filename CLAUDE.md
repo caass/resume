@@ -12,8 +12,8 @@ This project uses a Nix flake devshell — enter it with `nix develop` (or autom
 
 - `just build` — Build `result/resume.pdf`, with contact details from `.env` baked in.
 - `just` — List available recipes.
-- `pnpm dev` — Build once, then rebuild on file changes (watches `src/`).
-- `pnpm astro check` — TypeScript type checking.
+- `npm run dev` — Build once, then rebuild on file changes (watches `src/`).
+- `npm exec -- astro check` — TypeScript type checking.
 
 No test suite exists.
 
@@ -21,11 +21,13 @@ No test suite exists.
 
 `just build` runs `set -a; . ./.env; set +a; nix build --impure`: it exports the vars in `.env`, then builds the PDF reproducibly in a hermetic Nix derivation.
 
-Contact details (`PHONE_NUMBER`/`EMAIL_ADDRESS`) live in the gitignored `.env`. A pure Nix build can't read untracked files, so the flake reads the two vars via `builtins.getEnv` — empty under the default pure eval, real under `--impure`, which is why `just build` exports `.env` first — and injects only the ones that are set into the derivation's `env`, whence Astro's `loadEnv(mode, dir, "")` picks them up from `process.env` (the fields are optional, so a build without them just omits that contact info). A missing var is warned about (never fatal) on two layers: the `warnMissingContact` integration in `astro.config.ts` fires during the build itself (its in-sandbox log surfaces only with `-L` or on failure), and `flake.nix` additionally emits an eval-time `lib.warnIf` that always reaches the terminal. `loadEnv` is imported from `vite`, which is a direct dependency **pinned to the same range Astro uses** (see `package.json`) so pnpm dedupes it to Astro's own vite instead of installing a second copy — keep the two ranges in sync when upgrading Astro.
+Contact details (`PHONE_NUMBER`/`EMAIL_ADDRESS`) live in the gitignored `.env`. A pure Nix build can't read untracked files, so the flake reads the two vars via `builtins.getEnv` — empty under the default pure eval, real under `--impure`, which is why `just build` exports `.env` first — and injects only the ones that are set into the derivation's `env`, whence Astro's `loadEnv(mode, dir, "")` picks them up from `process.env` (the fields are optional, so a build without them just omits that contact info). A missing var is warned about (never fatal) on two layers: the `warnMissingContact` integration in `astro.config.ts` fires during the build itself (its in-sandbox log surfaces only with `-L` or on failure), and `flake.nix` additionally emits an eval-time `lib.warnIf` that always reaches the terminal. `loadEnv` is imported from `vite`, which is a direct dependency **pinned to the same range Astro uses** (see `package.json`) so the dependency tree dedupes it to Astro's own vite instead of installing a second copy — keep the two ranges in sync when upgrading Astro.
 
-The flake supplies the browser from the Nix store (chromium on Linux, unfree `google-chrome` on macOS where chromium isn't packaged) and points `astro-pdf` at it via `PUPPETEER_EXECUTABLE_PATH`; `.puppeteerrc.cjs` stops Puppeteer from downloading its own. On macOS the derivation exports `CFFIXED_USER_HOME` and launches Chrome with `--use-mock-keychain` so headless Chrome can start inside the Nix builder's homeless daemon-user environment. `pnpm` is pinned to v10 (`fetchPnpmDeps` `fetcherVersion = 3`); the `pnpm.configHook` deprecation warning during the build is expected and harmless.
+The flake supplies the browser from the Nix store (chromium on Linux, unfree `google-chrome` on macOS where chromium isn't packaged) and points `astro-pdf` at it via `PUPPETEER_EXECUTABLE_PATH`; `.puppeteerrc.cjs` stops Puppeteer from downloading its own. On macOS the derivation exports `CFFIXED_USER_HOME` and launches Chrome with `--use-mock-keychain` so headless Chrome can start inside the Nix builder's homeless daemon-user environment.
 
-`nix run .` starts the Astro dev server against the working tree; `nix develop` drops into a devshell with `node`, `pnpm`, `just`, and a browser on `PATH`.
+Dependencies are managed with **npm** (whatever ships with `pkgs.nodejs`, currently Node 24 / npm 11 — no separately-pinned package manager). The hermetic build fetches them via `fetchNpmDeps` (a fixed-output derivation keyed off `package-lock.json`; bump its `hash` in `flake.nix` whenever the lockfile changes) and installs them offline through `npmHooks.npmConfigHook`. The derivation sets `npmFlags = [ "--ignore-scripts" ]`: `astro-pdf` ships a `preinstall: npx only-allow pnpm` hook that both needs the network and rejects npm, and no dependency here needs a lifecycle script (esbuild/sharp/puppeteer all resolve to prebuilt platform packages), so scripts are skipped for both the `npm ci` and the `npm rebuild` that the hook runs.
+
+`nix run .` starts the Astro dev server against the working tree; `nix develop` drops into a devshell with `node`, `npm`, `just`, and a browser on `PATH`.
 
 ## Environment Variables
 

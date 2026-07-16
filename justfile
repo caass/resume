@@ -8,4 +8,4 @@ build:
 
 # Live-reloading PDF preview in the browser (serves the resume at / and opens it)
 dev:
-    set -a; . ./.env 2>/dev/null; set +a; pnpm exec astro dev --open
+    set -a; . ./.env 2>/dev/null; set +a; npm exec -- astro dev --open

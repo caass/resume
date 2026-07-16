@@ -32,8 +32,6 @@
         chromePath =
           if chromiumSupported then lib.getExe chrome else "${chrome}/bin/google-chrome-stable";
 
-        pnpm = pkgs.pnpm_10;
-
         # Contact details for the resume live in the gitignored .env, so they're
         # neither committed nor visible to the pure flake source. Read them from
         # the ambient environment instead: `builtins.getEnv` returns "" under the
@@ -66,7 +64,7 @@
             fileset = lib.fileset.unions [
               ./src
               ./package.json
-              ./pnpm-lock.yaml
+              ./package-lock.json
               ./astro.config.ts
               ./tsconfig.json
               ./.puppeteerrc.cjs
@@ -75,24 +73,28 @@
 
           nativeBuildInputs = [
             pkgs.nodejs
-            pnpm
-            pnpm.configHook
+            pkgs.npmHooks.npmConfigHook
             chrome
           ];
 
-          pnpmDeps = pkgs.fetchPnpmDeps {
+          npmDeps = pkgs.fetchNpmDeps {
             inherit (finalAttrs) pname version;
-            inherit pnpm;
             src = lib.fileset.toSource {
               root = ./.;
               fileset = lib.fileset.unions [
                 ./package.json
-                ./pnpm-lock.yaml
+                ./package-lock.json
               ];
             };
-            fetcherVersion = 3;
-            hash = "sha256-9+Dipbh1PLurXeGJ+s3QkqnhY3MVvL1vgZbd8msAWdI=";
+            hash = "sha256-FI5w0N5sdtPncIHbI8L1aq/e+o27X6ZgSSnwiIGE6ic=";
           };
+
+          # astro-pdf ships a `preinstall: npx only-allow pnpm` hook that both
+          # needs the network and rejects npm. We don't need any dependency's
+          # lifecycle scripts here — esbuild/sharp/puppeteer all resolve to
+          # prebuilt platform packages — so skip scripts for both the `npm ci`
+          # and the `npm rebuild` that npmConfigHook runs.
+          npmFlags = [ "--ignore-scripts" ];
 
           env = {
             PUPPETEER_EXECUTABLE_PATH = chromePath;
@@ -111,7 +113,7 @@
             export CFFIXED_USER_HOME=$HOME
             test -x "$PUPPETEER_EXECUTABLE_PATH"   # fail loud if our browser is missing
             echo "using browser: $PUPPETEER_EXECUTABLE_PATH"
-            pnpm exec astro build            # not `pnpm build` (that runs `open`)
+            npm exec -- astro build          # not `npm run build` (that runs `open`)
             runHook postBuild
           '';
 
@@ -130,21 +132,18 @@
         });
 
         # `nix run .` — the Astro dev server (live reload) against the working
-        # tree, with node/pnpm/chrome and the browser env set up.
+        # tree, with node/npm/chrome and the browser env set up.
         dev = pkgs.writeShellApplication {
           name = "resume-dev";
           runtimeInputs = [
             pkgs.nodejs
-            pnpm
             chrome
           ];
           text = ''
             export PUPPETEER_EXECUTABLE_PATH=${chromePath}
             export PUPPETEER_SKIP_DOWNLOAD=true
-            # Don't prompt to purge a node_modules left by another pnpm/version;
-            # there's no TTY when launched via `nix run`.
-            pnpm install --config.confirm-modules-purge=false
-            exec pnpm exec astro dev "$@"
+            npm install --no-fund --no-audit
+            exec npm exec -- astro dev "$@"
           '';
         };
       in
@@ -160,8 +159,7 @@
 
         devShells.default = pkgs.mkShell {
           packages = [
-            pkgs.nodejs
-            pnpm # pnpm_10, matching the package build
+            pkgs.nodejs # bundles npm, matching the package build
             chrome
             pkgs.just # task runner; see ./justfile (`just` lists recipes)
           ];

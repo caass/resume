@@ -10,7 +10,7 @@ import type { AstroIntegration } from "astro";
 
 // Merge .env files with process.env — prefix "" loads every key, not just
 // VITE_-prefixed ones. Covers both the Nix build (contact vars injected into
-// process.env, no .env in the sandbox) and pnpm/npm (Astro loads .env but
+// process.env, no .env in the sandbox) and npm (Astro loads .env but
 // doesn't put it on process.env). `vite` is a direct dependency pinned to the
 // same range Astro uses, so this dedupes to Astro's own vite (see package.json).
 const env = loadEnv(process.env.NODE_ENV ?? "production", process.cwd(), "");
@@ -23,8 +23,8 @@ function contactSet(key: string): boolean {
 
 // Warn (without failing) when the optional contact details are missing, so a
 // build doesn't silently ship a resume with no way to reach you. Runs in the
-// build pipeline via astro:build:start, so it fires however you build — pnpm,
-// npm, or nix.
+// build pipeline via astro:build:start, so it fires however you build — npm
+// or nix.
 function warnMissingContact(): AstroIntegration {
   return {
     name: "warn-missing-contact",
@@ -45,7 +45,7 @@ function warnMissingContact(): AstroIntegration {
 
 // When PUPPETEER_EXECUTABLE_PATH is set (Nix build/devShell), point astro-pdf at
 // that browser and disable Chrome's sandbox so it launches inside the Nix build
-// sandbox. Unset (plain `pnpm dev`/`build`), Puppeteer uses its own browser.
+// sandbox. Unset (plain `npm run dev`/`build`), Puppeteer uses its own browser.
 const pdfExecutable = process.env.PUPPETEER_EXECUTABLE_PATH;
 const launch = pdfExecutable
   ? { executablePath: pdfExecutable, args: ["--no-sandbox", "--use-mock-keychain"] }

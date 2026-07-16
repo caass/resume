@@ -6,9 +6,9 @@ This repository contains both the contents and the layout of my resume, written 
 
 ## Building
 
-With [pnpm](https://pnpm.io): `pnpm build` writes `dist/resume.pdf` and opens it.
+With [Node](https://nodejs.org) (npm ships with it): `npm install && npm run build` writes `dist/resume.pdf` and opens it.
 
-Or with [Nix](https://nixos.org) — no `node`/`pnpm` needed on the host:
+Or with [Nix](https://nixos.org) — no Node needed on the host:
 
 - `nix build .` → `result/resume.pdf`
 - `nix run .` → the Astro dev server
