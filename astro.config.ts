@@ -150,6 +150,18 @@ export default defineConfig({
     }),
     pdfPreview(),
   ],
+  // nix-direnv rewrites files under .direnv/ whenever it refreshes the flake
+  // profile (e.g. a new shell after a store GC), and `just build` writes the
+  // result/ symlink. Both live inside the project root, so Vite's dev-server
+  // watcher would otherwise pick up that churn and stutter the running server.
+  // .gitignore doesn't help — chokidar watches by directory, not git status.
+  vite: {
+    server: {
+      watch: {
+        ignored: ["**/.direnv/**", "**/result/**"],
+      },
+    },
+  },
   env: {
     schema: {
       PHONE_NUMBER: envField.number({
