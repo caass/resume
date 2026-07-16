@@ -1,7 +1,6 @@
 import { defineConfig, envField } from "astro/config";
 import { loadEnv } from "vite";
 
-import mdx from "@astrojs/mdx";
 import icon from "astro-icon";
 import pdf from "astro-pdf";
 import puppeteer, { type Browser, type Page } from "puppeteer";
@@ -123,7 +122,6 @@ function pdfPreview(): AstroIntegration {
 export default defineConfig({
   integrations: [
     warnMissingContact(),
-    mdx(),
     icon({
       include: {
         lucide: [

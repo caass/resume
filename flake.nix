@@ -86,7 +86,7 @@
                 ./package-lock.json
               ];
             };
-            hash = "sha256-FI5w0N5sdtPncIHbI8L1aq/e+o27X6ZgSSnwiIGE6ic=";
+            hash = "sha256-aAZ2hHO5pfoi4x646WFqO0/+JBByy1+tk6n7u2sdJZE=";
           };
 
           # astro-pdf ships a `preinstall: npx only-allow pnpm` hook that both

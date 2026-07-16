@@ -2,7 +2,7 @@
 
 I got sick and tired of having to re-learn Microsoft Word's archaic system for columns, spacing, and padding every time I started job hunting. "Wait," I though to myself, "I already _know_ an archiac system for columns, spacing and padding! It's called Cascading Style Sheets!" And thus, I rewrote my entire resume into JSX.
 
-This repository contains both the contents and the layout of my resume, written using [Astro](https://astro.build) and rendered to PDF using [Puppeteer](https://pptr.dev) (via [astro-pdf](https://github.com/lameuler/astro-pdf)). The resume content itself lives in MDX and YAML files, which Astro ingests and renders into a static page before Puppeteer converts it to PDF.
+This repository contains both the contents and the layout of my resume, written using [Astro](https://astro.build) and rendered to PDF using [Puppeteer](https://pptr.dev) (via [astro-pdf](https://github.com/lameuler/astro-pdf)). The resume content itself lives in YAML files, which Astro ingests and renders into a static page before Puppeteer converts it to PDF.
 
 ## Building
 
