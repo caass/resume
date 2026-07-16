@@ -5,6 +5,16 @@
 // resume HTML itself lives at /raw, which astro-pdf renders to resume.pdf for
 // the build. In a static build this page is a harmless landing page that embeds
 // the generated resume.pdf.
+//
+// A content edit broadcasts a full reload (see astro.config.ts), which re-fetches
+// this page and thus re-requests the iframe. But Chrome's embedded PDF viewer
+// caches its rendered document by URL and reuses it on a same-URL reload — even
+// with the middleware's `Cache-Control: no-store` — so the preview would show
+// stale output. Appending a per-load token makes each reload a distinct URL,
+// forcing the viewer to render afresh. `import.meta.env.DEV` builds embed the
+// static resume.pdf with no token. The middleware keys off the pathname, so the
+// query string is ignored on the server side.
+const pdfSrc = import.meta.env.DEV ? `/resume.pdf?t=${Date.now()}` : "/resume.pdf";
 ---
 
 <!doctype html>
@@ -29,6 +39,6 @@
     </style>
   </head>
   <body>
-    <iframe src="/resume.pdf" title="Résumé PDF preview"></iframe>
+    <iframe src={pdfSrc} title="Résumé PDF preview"></iframe>
   </body>
 </html>
