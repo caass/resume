@@ -2,21 +2,23 @@
   category: Soft
   items:
     - Technical Leadership
-    - Mentorship
-    - Conflict Resolution
+    - Agile Development
     - Non-Technical Communication
 - id: hard-skills
   category: Hard
   items:
     - Distributed Systems
     - Event-Driven Architectures
-    - Concurrency
-    - High-Performance
-    - Developer Experience
+    - UI/UX
+    - DevX
 - id: languages
   category: Languages
   items:
     - Rust
     - Go
     - Typescript
+    - React
     - Python
+    - Node.js
+    - Nix
+    - Bash
