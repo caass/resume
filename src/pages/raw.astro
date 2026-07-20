@@ -19,6 +19,7 @@ const allSkills = await getCollection("skills");
 // Orgs (and the positions within them) are grouped in the data itself; here we
 // just split by section and order orgs most-recent-first.
 const sectionOrder = ["experience", "research", "education"] as const;
+const skillOrder = ["soft-skills", "hard-skills", "languages"] as const;
 
 const sections = sectionOrder.map((sectionId) => ({
   title: sectionId.charAt(0).toUpperCase() + sectionId.slice(1),
@@ -27,6 +28,10 @@ const sections = sectionOrder.map((sectionId) => ({
     .filter((data) => data.section === sectionId)
     .sort((a, b) => b.from.getTime() - a.from.getTime()),
 }));
+
+const skills = skillOrder.map(
+  (skillId) => allSkills.find((skill) => skill.id === skillId)!.data,
+);
 ---
 
 <Layout>
@@ -56,10 +61,8 @@ const sections = sectionOrder.map((sectionId) => ({
     }
     <Section title="Skills" class="skills">
       {
-        allSkills.map((skill) => (
-          <Skill category={skill.data.category}>
-            {skill.data.items.join(", ")}
-          </Skill>
+        skills.map((skill) => (
+          <Skill category={skill.category}>{skill.items.join(", ")}</Skill>
         ))
       }
     </Section>
